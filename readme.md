@@ -8,6 +8,7 @@
 # Running the Pipeline
     - Pull the main branch from github
     - Install the needed dependencies
+        - BioGrinder
     - run the BioGrinder.sh with the correct parameters(described bellow)
     - Ouput directory will be created in the output folder
 
