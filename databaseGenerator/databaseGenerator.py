@@ -1,6 +1,8 @@
 from os import path
 from Bio import SeqIO
 import random
+import pathlib
+
 
 
 def main():
@@ -16,7 +18,7 @@ def parseDatabase():
     databaseRecords = []
 
     for record in SeqIO.parse(
-            "/home/brian/Documents/afstudeerstage/bioGrinderPipeline/databaseGenerator/aspergilllus.fasta", "fasta"):
+            str(pathlib.Path(__file__).parent.resolve()) + "/aspergillus.fasta", "fasta"):
         databaseRecords.append([record.description, record.seq])
  
 
@@ -25,7 +27,7 @@ def parseDatabase():
 def parsePrimers():
     primerSequences = []
     for record in SeqIO.parse(
-            "/home/brian/Documents/afstudeerstage/bioGrinderPipeline/databaseGenerator/RC-PCR-primers.fasta", "fasta"):
+            str(pathlib.Path(__file__).parent.resolve()) +  "/RC-PCR-primers.fasta", "fasta"):
         primerSequences.append(record.seq)
 
     return primerSequences
