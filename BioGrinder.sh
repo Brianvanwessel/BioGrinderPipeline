@@ -7,6 +7,7 @@ readDistance=151
 fastq=true
 baseDir=$(pwd)
 databaseModification=false
+primerFile="RC-PCR-primers-changed.fasta"
 # Parsing given parameters.
 while getopts "r:d:p:n:a:f:r:x" OPTION; do
 	case $OPTION in
@@ -43,11 +44,6 @@ if [ -z "$database" ]; then
         exit 1
 fi
 
-# Check for mandatory parameters
-if [ -z "$primerFile" ]; then
-        echo 'Missing p' >&2
-        exit 1
-fi
 
 # Create primer file for each primer
 boolean=false
@@ -113,7 +109,8 @@ do
   readarray -d / -t strarr2 <<< "${strarr[0]}"
 
   # Name of output file
-  outputFileName=`echo ${strarr2[2]}`
+  outputFileName=`echo ${strarr2[2]}
+  `
   # Move created output
   mv grinder-reads.fastq ${baseDir}/data/BioGrinderFiles/$outputFileName-reads.fastq
   mv grinder-ranks.txt ${baseDir}/data/BioGrinderAnnotationFiles/$outputFileName-ranks.txt
@@ -128,15 +125,18 @@ forwardCounter=0
 reverseCounter=0
 # Filling files for forward and reverse amplicons
 FILES="data/BioGrinderFiles/*"
+
 # Loop over all files in the folder
 for f in $FILES
 do
 	# Split the File name
 	readarray -d / -t splitFilename <<< "${f}"
+
 	# Open the file
 	while read p; do
 		# If the files contains forward amplicons, process them		
 		if [[ "${splitFilename[2]}" =~ .*"F".* ]]; then
+			FILE=$(echo $baseDir/data/BioGrinderFiles/${splitFilename[2]/"F"/"R"} | xargs)
 			# Check if the line is a fastq header
 			if [[ "${p}" =~ "@".* ]]; then
 				# Up the ID by 1 when a new header is found
@@ -154,15 +154,20 @@ do
 					fi
 					
 				done
-				# Write to the output file
-				echo ${newHeader} >> ${baseDir}/output/${runName}/${runName}_forward_reads.fastq
+				
+				if test -f "$FILE"; then
+					echo ${newHeader} >> ${baseDir}/output/${runName}/${runName}_forward_reads.fastq
+				fi
 			# All the fastq lines that are not headers
 			else
 				# Write to the output file
-				echo ${p} >> ${baseDir}/output/${runName}/${runName}_forward_reads.fastq
+				if test -f "$FILE"; then
+					echo ${p} >> ${baseDir}/output/${runName}/${runName}_forward_reads.fastq
+				fi
 			fi
 		# If the files contains reverse amplicons, process them		
   		elif [[ "${splitFilename[2]}" =~ .*"R".* ]]; then
+		  	FILE2=$(echo $baseDir/data/BioGrinderFiles/${splitFilename[2]/"R"/"F"} | xargs)
 		    # Check if the line is a fastq header
 			if [[ "${p}" =~ "@".* ]]; then
 				# Up the ID by 1 when a new header is found
@@ -181,11 +186,15 @@ do
 					
 				done
 				# Write to the output file
-				echo ${newHeader} >> ${baseDir}/output/${runName}/${runName}_reverse_reads.fastq
+				if test -f "$FILE2"; then
+					echo ${newHeader} >> ${baseDir}/output/${runName}/${runName}_reverse_reads.fastq
+				fi
 			# All the fastq lines that are not headers
 			else
 				# Write to the output file
-				echo ${p} >> ${baseDir}/output/${runName}/${runName}_reverse_reads.fastq
+				if test -f "$FILE2"; then
+					echo ${p} >> ${baseDir}/output/${runName}/${runName}_reverse_reads.fastq
+				fi
 			fi
 		fi
 	done < "${baseDir}/${f}"
@@ -196,14 +205,21 @@ FILE=${baseDir}/output/${runName}/${runName}_forward_reads.fastq.gz
 if test -f "$FILE"; then
 	gzip ${baseDir}/output/${runName}/${runName}_forward_reads.fastq -f
 	gzip ${baseDir}/output/${runName}/${runName}_reverse_reads.fastq -f
+
+	mv ${baseDir}/output/${runName}/${runName}_forward_reads.fastq.gz ${baseDir}/output/${runName}/${runName}_S99_L001_R1_001.fastq.gz
+	mv ${baseDir}/output/${runName}/${runName}_reverse_reads.fastq.gz ${baseDir}/output/${runName}/${runName}_S99_L001_R2_001.fastq.gz
+
 else
 	gzip ${baseDir}/output/${runName}/${runName}_forward_reads.fastq 
     gzip ${baseDir}/output/${runName}/${runName}_reverse_reads.fastq
+
+	mv ${baseDir}/output/${runName}/${runName}_forward_reads.fastq.gz ${baseDir}/output/${runName}/${runName}_S99_L001_R1_001.fastq.gz
+	mv ${baseDir}/output/${runName}/${runName}_reverse_reads.fastq.gz ${baseDir}/output/${runName}/${runName}_S99_L001_R2_001.fastq.gz
 fi
 
 
 # Remove all used Files
 rm $baseDir/data/database/modifiedDatabase.fasta
 rm -rfv data/createdPrimerFiles/*
-# rm -rfv data/BioGrinderFiles/*
+rm -rfv data/BioGrinderFiles/*
 rm -rfv data/BioGrinderAnnotationFiles/*

@@ -15,13 +15,13 @@
     - Mandatory parameters:
         - "-d (Database name)" Use this paraemter to give the name of the database that will be used. 
             - Mandatory.
-        - "-p (Primer file)" Use this parameter to give the name of the primer file that will be used.
-            - Mandatory.
         - "-n (Name for the run)" Use this parameter to give a name to the pipeline run.
             - Mandatory.
     - Change default values:
         - "-r (Amplicon length)" Use this parameter to change the read length. 
             - Default is 151.
+        - "-p (Primer file)" Use this parameter to change the name of the primer file that will be used.
+            - Default is RC-PCR-primers-changed.fasta.
     - Optional parameters:
         - "-x" Add this paramameter to add the first forward and last reverse primer to you target database.
             - Optional.
