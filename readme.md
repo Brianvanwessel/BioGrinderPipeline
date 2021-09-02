@@ -8,7 +8,8 @@
 # Running the Pipeline
     - Pull the main branch from github
     - Install the needed dependencies
-        - BioGrinder
+    - Make sure a file contanining a 16S/18S database is present in the /data/database directory
+    - Make sure a file containing the primers is present the /data/primers directory
     - run the BioGrinder.sh with the correct parameters(described bellow)
     - Ouput directory will be created in the output folder
 
@@ -37,3 +38,7 @@
         - Add a fasta file contanining a 16S/18S database in the /data/database directory
         - Add a fasta file containing the primers in the /data/primers directory
         - Run the BioGrinder.sh script with the correct parameters(described above)
+
+# Dependencies
+    - BioGrinder
+    - UNIX based system
